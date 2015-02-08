@@ -7,3 +7,7 @@ del grado al que pertenezco
 Para hacer todo he usado los siguientes documentos:
 Un tutorial de cómo conectar Ruby y MySQL
 http://zetcode.com/db/mysqlrubytutorial/
+
+Para usar Ruby, hemos de ejecutar irb
+El archivo ListingDatabases.md lo único que hace es listar en ruby
+Las bases de datos MySQL de nuestro sistema
