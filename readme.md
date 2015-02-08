@@ -1,4 +1,3 @@
-/*--------------- Español ---------------*/
 Es una versión simple del tradicional juego del Monopoly.
 Está conectado con una una base de datos en MariaDB.
 
