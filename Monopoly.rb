@@ -137,19 +137,20 @@ class Administrador
     def verCasilla
         puts 'Inserte el idCasilla que desea ver'
         id_casilla = gets.chomp
+
         result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
+        
         fields = result.fetch_fields
-        puts "%3s %s" % [fields[0].name, fields[1].name]
-        result.each do |row|
-            puts "3%s %s" % [row['idCasilla'], row['tipoCasilla'], row['precioCompra'], row['precioVenta'], row['cuota'], row['efectoCasilla']]
+        print "\n" + fields[0].name + "\t" + fields[1].name + "\t" + fields[2].name + "\t" + fields[3].name + "\t" + fields[4].name + "\t" + fields[5].name
+        
+        result.each_hash do |row|
+            print "\n" + row['idCasilla'] + "\t" + row['tipoCasilla'] + "\t" + row['precioCompra'] + "\t" + row['precioVenta'] + "\t" + row['cuota'] + "\t" + row['efectoCasilla'] +"\n"
         end
-        begin=
-        result.each do |array|
-            array.each do |value|
-                puts value
-            end
-        end
-        =end
+        #result.each do |array|
+         #   array.each do |value|
+          #      puts value
+           # end
+        #end
     end
             
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
