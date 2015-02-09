@@ -8,9 +8,8 @@ Para hacer todo he usado los siguientes documentos:
 Un tutorial de cómo conectar Ruby y MySQL
 http://zetcode.com/db/mysqlrubytutorial/
 
-Para usar Ruby, hemos de ejecutar irb
+Otro tutorial parecido
+http://www.codebeach.com/2009/10/ruby-and-mysql-tutorial.html?m=1
 
-El archivo ListingDatabases.md lo único que hace es listar en ruby las bases de datos MySQL de nuestro sistema
-
-El archivo CreatePopulatingTable.ruby es un ejemplo de creación de tablas e inserción de elementos desde ruby.
+Para usar Ruby, hemos de ejecutar irb nombre_archivo.rb
 

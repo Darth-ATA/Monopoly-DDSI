@@ -1,4 +1,5 @@
 #!/usr/bin/irb
+
 require 'mysql'
 
 class Administrador
@@ -9,7 +10,7 @@ class Administrador
         @subsistema = 0
         
         #Conecta con la base de datos y nos da la versión que se está usando
-        @con = Mysql.new 'localhost', 'monopoly', 'monopoly', 'Monopoly'
+        @con = Mysql.new('localhost', 'monopoly', 'monopoly', 'Monopoly')
         
         puts @con.get_server_info
         @rs = @con.query 'SELECT VERSION()'
@@ -54,14 +55,21 @@ class Administrador
     def verTablero
         puts 'Inserte el idTablero que desea ver'
         id_tablero = gets.chomp
-        @con.query("SELECT * FROM tablero WHERE idTablero = '#{id_tablero}'")
-        puts 'Sus casillas asociadas son:'
-        @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
+        result = @con.query("SELECT numeroCasillas FROM tablero WHERE idTablero = '#{id_tablero}'")
+        puts "El tablero #{id_tablero} tiene #{result} casillas y son: "
+        result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
+        indice = 1
+        result.each do |array|
+            array.each do |value|
+                puts "\t#{indice}- "+value
+                indice += 1
+            end
+        end
     end
 
     #---------------------- Subsistema de Casillas ----------------------#
     def insertarCasilla
-        #Crea la tabla tablero si no la tenemos ya en el sistema
+        #Crea la tabla casilla si no la tenemos ya en el sistema
         @con.query("CREATE TABLE IF NOT EXISTS casilla(idCasilla varchar(20) PRIMARY KEY \
                     ,precioCompra int, precioVenta int, cuota int \
                     ,tipoCasilla varchar(20) \
