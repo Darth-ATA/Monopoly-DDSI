@@ -18,6 +18,57 @@ class Administrador
         @rs = @con.query 'SELECT VERSION()'
         puts @rs.fetch_row
 
+        #####
+        #Creación de tablas en caso de que no existan
+        #####
+
+        #Tablero
+        @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) PRIMARY KEY, numeroCasillas int);")
+
+        #Asociada
+        @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) REFERENCES tablero(idTablero) \
+        ,idCasilla varchar(20) REFERENCES casilla(idCasilla) \
+        ,PRIMARY KEY(idTablero,idCasilla));")
+
+        #Casilla
+        @con.query("CREATE TABLE IF NOT EXISTS casilla(idCasilla varchar(20) PRIMARY KEY \
+        ,tipoCasilla varchar(20) \
+        ,precioCompra int, precioVenta int, cuota int \
+        CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
+        ,efectoCasilla varchar(10000));")
+
+        #Tarjeta
+        @con.query("CREATE TABLE IF NOT EXISTS tarjeta(idTarjeta varchar(20) PRIMARY KEY \
+        ,tipoTarjeta varchar(20) \
+        ,efectoTarjeta varchar(1000) \
+        , CONSTRAINT tipo_tarjeta_valido CHECK(tipoTarjeta='suerte' or tipoTarjeta='caja'));")
+
+        #Partida
+        @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida VARCHAR(10) PRIMARY KEY \
+        ,fecha date NOT NULL \
+        ,estado VARCHAR(20) NOT NULL);")
+
+        #PtieneJugador
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        ,nick VARCHAR(20) REFERENCES jugador(nick) \
+        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
+
+        #PtieneTablero
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTablero(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        ,idTablero VARCHAR(20) REFERENCES tablero(idTablero) \
+        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
+
+        #PtieneTarjeta
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTarjeta(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        ,idTarjeta VARCHAR(20) REFERENCES tarjeta(idTarjeta) \
+        ,CONSTRAINT clave_primaria PRIMARY KEY (idTarjeta))")
+
+        #Posee
+        @con.query("CREATE TABLE IF NOT EXISTS posee(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        ,nick VARCHAR(20) REFERENCES jugador(nick) \
+        ,idPropiedad int REFERENCES propiedad(idPropiedad) \
+        ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
+
     end
 
     def visualizarQuery(result)
@@ -33,9 +84,6 @@ class Administrador
 
     #---------------------- Subsistema de Tableros ----------------------#
     def insertarTablero
-        #Crea la tabla tablero si no la tenemos ya en el sistema
-        @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) PRIMARY KEY, numeroCasillas int);")
-
         puts 'Inserte el idTablero que desea agregar'
         id_tablero = gets.chomp
 
@@ -50,10 +98,6 @@ class Administrador
     end
     #Asocia una casilla a un tablero
     def asociarCasilla
-        @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) REFERENCES tablero(idTablero) \
-                    ,idCasilla varchar(20) REFERENCES casilla(idCasilla) \
-                    ,PRIMARY KEY(idTablero,idCasilla));")
-
         puts 'Inserte el idTablero que al que desea asociar casilla'
         id_tablero = gets.chomp
 
@@ -91,13 +135,6 @@ class Administrador
 
     #---------------------- Subsistema de Casillas ----------------------#
     def insertarCasilla
-        #Crea la tabla casilla si no la tenemos ya en el sistema
-        @con.query("CREATE TABLE IF NOT EXISTS casilla(idCasilla varchar(20) PRIMARY KEY \
-                    ,tipoCasilla varchar(20) \
-                    ,precioCompra int, precioVenta int, cuota int \
-                        CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
-                    ,efectoCasilla varchar(10000));")
-
         puts 'Inserte el idCasilla que desea agregar'
         id_casilla = gets.chomp
 
@@ -180,11 +217,6 @@ class Administrador
 
     #---------------------- Subsistema de Tarjetas ----------------------#
     def insertarTarjeta
-        #Crea la tabla de tarjeta si no existe en nuestro sistema
-        @con.query("CREATE TABLE IF NOT EXISTS tarjeta(idTarjeta varchar(20) PRIMARY KEY \
-                        ,tipoTarjeta varchar(20) \
-                        ,efectoTarjeta varchar(1000) \
-                        , CONSTRAINT tipo_tarjeta_valido CHECK(tipoTarjeta='suerte' or tipoTarjeta='caja'));")
         puts 'Inserte el idTarjeta que desea agregar'
         id_tarjeta = gets.chomp
 
@@ -313,18 +345,6 @@ class Sistema
         puts @rs.fetch_row
     end
     def añadirPartida
-        @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida VARCHAR(10) PRIMARY KEY \
-                        ,fecha date NOT NULL \
-                        ,estado VARCHAR(20) NOT NULL);")
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
-                        ,nick VARCHAR(20) REFERENCES jugador(nick) \
-                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneTablero(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
-                        ,idTablero VARCHAR(20) REFERENCES tablero(idTablero) \
-                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneTarjeta(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
-                        ,idTarjeta VARCHAR(20) REFERENCES tarjeta(idTarjeta) \
-                        ,CONSTRAINT clave_primaria PRIMARY KEY (idTarjeta))")
 
         @fecha_actual = Time.now
 
@@ -353,10 +373,6 @@ class Sistema
         #Aquí habría que coger una colección aleatoria de tarjetas y añadirlas a la tabla PtieneTarjeta
     end
     def añadirPropiedadJugador
-        @con.query("CREATE TABLE IF NOT EXISTS posee(idPartida VAHRCAR(10) REFERENCES partida(idPartida) \
-                        ,nick VARCHAR(20) REFERENCES jugador(nick) \
-                        ,idPropiedad int REFERENCES propiedad(idPropiedad) \
-                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
         puts '¿Qué propiedad se ha comprado?'
         id_propiedad = gets.chomp
 
