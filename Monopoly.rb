@@ -5,8 +5,8 @@ class Administrador
     def initialize(nombre = "admin")
         @nombre = nombre
         #Son dos variables que controlan el menú
-        @gestionando = "OK"
-        @subsistema = "OK"
+        @gestionando = 0
+        @subsistema = 0
         
         #Conecta con la base de datos y nos da la versión que se está usando
         @con = Mysql.new 'localhost', 'monopoly', 'monopoly', 'Monopoly'
@@ -30,11 +30,20 @@ class Administrador
         @con.query("DELETE FROM tablero where ('#{id_tablero}' = idTablero)")
     end
     def asociarCasilla
+        @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) references tablero(idTablero),idCasilla varchar(20) references casilla(idCasilla) \
+                    ,primary key(idTablero,idCasilla));")
         puts 'Inserte el idTablero que al que desea asociar casilla'
         id_tablero = gets.chomp
         puts 'Inserte el idCasilla que desea asociar'
         id_casilla = gets.chomp
-        @con.query("INSERT INTO asociadas(idTablero,idCasilla) VALUES('#{id_tablero},#{id_casilla}")
+        @con.query("INSERT INTO asociada(idTablero,idCasilla) VALUES('#{id_tablero}','#{id_casilla}')")
+    end
+    def desAsociarCasilla
+        puts 'Inserte el idTablero del que desea desasociar la casilla'
+        id_tablero = gets.chomp
+        puts 'Inserte la idCasilla de la casilla que desea desasociar'
+        id_casilla = gets.chomp
+        @con.query("DELETE FROM asociada where ('#{id_tablero}' = idTablero && '#{id_casilla}' = idCasilla)")
     end
     def verTablero
         puts 'Inserte el idTablero que desea ver'
@@ -42,15 +51,15 @@ class Administrador
         @con.query("Select * from tablero where idTablero = '#{id_tablero}'")
     end
     def gestion
-        while(@subsistema != "quit")
+        while @subsistema != 9 do
             puts "Bienvenido Administrador"
-            puts "¿Qué desea gestionar? \n\t1- Tablero \n\t2- Casillas \n\t3- Tarjetas"
+            puts "¿Qué desea gestionar? \n\t1- Tablero \n\t2- Casillas \n\t3- Tarjetas \n\t9- Salir"
             print "Opcion: "
-            gestionar = Integer(gets.chomp)
-            if(gestionar == 1)
+            @subsistema = Integer(gets.chomp)
+            if @subsistema == 1
                 while @gestionando != 9 do
                     puts "Gestión de Tableros"
-                    puts "\t1- Insertar \n\t2- Borrar \n\t3- Asociar una casilla a un tablero \n\t4- Ver \n\t9- Salir"
+                    puts "\t1- Insertar \n\t2- Borrar \n\t3- Asociar una casilla a un tablero \n\t4- Ver \n\t5- Desasociar Casilla \n\t9- Salir"
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
                     if(@gestionando == 1)
@@ -61,11 +70,13 @@ class Administrador
                         self.asociarCasilla
                     elsif(@gestionando == 4)
                         self.verTablero
+                    elsif(@gestionando == 5)
+                        self.desAsociarCasilla
                     end
 
                 end
                 @gestionando = "OK"
-            elsif(gestionar == 2)
+            elsif @subsistema == 2
                 while @gestionando != "quit" do
                     puts "Gestión de Casillas"
                     puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar"
@@ -73,7 +84,7 @@ class Administrador
                     @gestionando = Integer(gets.chomp)
                 end
                 @gestionando = "OK"
-            else
+            elsif @subsistema == 3
                 while @gestionando != "quit" do
                     puts "Gestión de Tarjetas"
                     puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar"
