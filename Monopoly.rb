@@ -21,17 +21,17 @@ class Administrador
     def insertarTablero
         #Crea la tabla tablero si no la tenemos ya en el sistema
         @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) PRIMARY KEY, numeroCasillas int);")
-        
+
         puts 'Inserte el idTablero que desea agregar'
         id_tablero = gets.chomp
-        
+
         @con.query("INSERT INTO tablero(idTablero, numeroCasillas) VALUES('#{id_tablero}', '0');")
     end
 
     def borrarTablero
         puts 'Inserte el idTablero que desea borrar'
         id_tablero = gets.chomp
-        
+
         @con.query("DELETE FROM tablero WHERE ('#{id_tablero}' = idTablero)")
     end
     #Asocia una casilla a un tablero
@@ -39,35 +39,35 @@ class Administrador
         @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) REFERENCES tablero(idTablero) \
                     ,idCasilla varchar(20) REFERENCES casilla(idCasilla) \
                     ,PRIMARY KEY(idTablero,idCasilla));")
-        
+
         puts 'Inserte el idTablero que al que desea asociar casilla'
         id_tablero = gets.chomp
-        
+
         puts 'Inserte el idCasilla que desea asociar'
         id_casilla = gets.chomp
-        
+
         @con.query("INSERT INTO asociada(idTablero,idCasilla) VALUES('#{id_tablero}','#{id_casilla}')")
     end
     #Desasocia una casilla de un tablero
     def desAsociarCasilla
         puts 'Inserte el idTablero del que desea desasociar la casilla'
         id_tablero = gets.chomp
-        
+
         puts 'Inserte la idCasilla de la casilla que desea desasociar'
         id_casilla = gets.chomp
-        
+
         @con.query("DELETE FROM asociada WHERE ('#{id_tablero}' = idTablero && '#{id_casilla}' = idCasilla)")
     end
     #Ve el número de casillas y las casillas del tablero
     def verTablero
         puts 'Inserte el idTablero que desea ver'
         id_tablero = gets.chomp
-        
+
         result = @con.query("SELECT * FROM tablero WHERE idTablero = '#{id_tablero}'").fetch_row
         puts "El tablero #{result[0]} tiene #{result[1]} casillas y son: "
-        
+
         result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
-        
+
         indice = 1
         result.each do |array|
             array.each do |value|
@@ -85,25 +85,25 @@ class Administrador
                     ,precioCompra int, precioVenta int, cuota int \
                         CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
                     ,efectoCasilla varchar(10000));")
-        
+
         puts 'Inserte el idCasilla que desea agregar'
         id_casilla = gets.chomp
-        
+
         puts 'Inserte el tipoCasilla que es'
         tipo_casilla = gets.chomp
-        
+
         if tipo_casilla == "calle"
             puts 'Inserte el precioCompra de la calle'
             precio_compra = gets.chomp
-            
+
             puts 'Inserte el precioVenta de la calle'
             precio_venta = gets.chomp
-            
+
             puts 'Inserte la cuota de la calle'
             cuota = gets.chomp
-            
+
             @con.query("INSERT INTO casilla(idCasilla, precioCompra, precioVenta, cuota, tipoCasilla) \
-                            VALUES('#{id_casilla}','#{precio_compra}','#{precio_venta}','#{cuota}', '#{tipo_casilla}')")
+                            VALUES('#{id_casilla}','#{precio_compra}','#{precio_venta}','#{cuota}', '#{tipo_casilla}'")
         else
             if tipo_casilla == "efecto"
                 puts 'Inserte una descripción del efecto de la dasilla'
@@ -113,6 +113,7 @@ class Administrador
             else
                 efecto_casilla = 'Coja una tarjeta de caja del centro del tablero'
             end
+
             @con.query("INSERT INTO casilla(idCasilla, efectoCasilla, tipoCasilla \
                             VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}'))")
         end
@@ -121,14 +122,14 @@ class Administrador
     def borrarCasilla
         puts 'Inserte el idCasilla que desea borrar'
         id_casilla = gets.chomp
-        
+
         @con.query("DELETE FROM casilla WHERE ('#{id_casilla}' = idCasilla)")
     end
     #Modificación de casilla de la base de datos
     def modificarCasilla
         puts 'Inserte el idCasilla que deasea modificar'
         id_casilla = gets.chomp
-       
+
         puts "¿Qué desea modificar? \n\t1- Todo \n\t2- PrecioCompra/PrecioVenta/Cuota \n\t3- Efecto \n\t9- Salir"
         modificar = Integer(gets.chomp)
         if modificar == 1
@@ -137,13 +138,13 @@ class Administrador
         elsif modificar == 2
             print "PrecioCompra = "
             precio_compra = Integer(gets.chomp)
-            
+
             print "PrecioVenta = "
             precio_venta = Integer(gets.chomp)
-            
+
             print "Cuota = "
             cuota = Integer(gets.chomp)
-            
+
             @con.query("UPDATE casilla SET precioCompra = '#{precio_compra}' \
                                         && precioVenta = '#{precio_venta}' \
                                         && cuota = '#{cuota}' \
@@ -151,7 +152,7 @@ class Administrador
         elsif modificar == 3
             print "Efecto : "
             efecto_casilla = gets.chomp
-            
+
             @con.query("UPDATE casilla SET efecto_casilla = '#{efecto_casilla}' WHERE ('#{id_casilla}' = idCasilla)")
         end
     end
@@ -179,10 +180,10 @@ class Administrador
                         , CONSTRAINT tipo_tarjeta_valido CHECK(tipoTarjeta='suerte' or tipoTarjeta='caja'));")
         puts 'Inserte el idTarjeta que desea agregar'
         id_tarjeta = gets.chomp
-        
+
         puts 'Inserte el tipoTarjeta que es'
         tipo_tarjeta = gets.chomp
-        
+
         puts 'Inserte la desripción del efecto de la tarjeta'
         efecto_tarjeta = gets.chomp
 
@@ -192,19 +193,19 @@ class Administrador
     def borrarTarjeta
         puts 'Inserte el idTarjeta que desea borrar'
         id_tarjeta = gets.chomp
-        
+
         @con.query("DELETE FROM tarjeta WHERE ('#{id_tarjeta}' = idTarjeta)")
     end
     def modificarTarjeta
         puts 'Inserte el idTarjeta que desea modificar'
         id_tarjeta = gets.chomp
-        
+
         puts 'Inserte el nuevo tipo: '
         tipo_tarjeta = gets.chomp
-        
+
         puts 'Inserte el nuevo efecto de la tarjeta'
         efecto_tarjeta = gets.chomp
-        
+
         @con.query("UPDATE tarjeta SET tipoTarjeta = '#{tipo_tarjeta}' \
                                         && efectoTarjeta = '#{efecto_tarjeta}' \
                                         WHERE ('#{id_tarjeta}' = idTarjeta)")
@@ -222,14 +223,14 @@ class Administrador
             puts "¿Qué desea gestionar? \n\t1- Tablero \n\t2- Casillas \n\t3- Tarjetas \n\t9- Salir"
             print "Opcion: "
             @subsistema = Integer(gets.chomp)
-            
+
             if @subsistema == 1
                 while @gestionando != 9 do
                     puts "Gestión de Tableros"
                     puts "\t1- Insertar \n\t2- Borrar \n\t3- Asociar una casilla a un tablero \n\t4- Ver \n\t5- Desasociar Casilla \n\t9- Salir"
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
-                    
+
                     if(@gestionando == 1)
                         self.insertarTablero
                     elsif(@gestionando == 2)
@@ -250,7 +251,7 @@ class Administrador
                     puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar \n\t4- Ver \n\t9- Salir"
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
-                    
+
                     if @gestionando == 1
                         self.insertarCasilla
                     elsif @gestionando == 2
@@ -268,7 +269,7 @@ class Administrador
                     puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar \n\t4- Ver \n\t9- Salir"
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
-                    
+
                     if @gestionando == 1
                         self.insertarTarjeta
                     elsif @gestionando == 2
@@ -290,17 +291,17 @@ begin
 
     puts "En caso de ser un Administrador escriba 1."
     individuo = Integer(gets.chomp)
-    
+
     if(individuo == 1)
         admin = Administrador.new("admin")
         admin.gestion
     else
         print "Usuario: "
         usuario = gets.chomp
-        
+
         print "Contraseña: "
         contraseña = gets.chomp
-        
+
         puts "................."
         puts "Bienvenido a Monopoly #{usuario}"
     end
