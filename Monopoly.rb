@@ -71,8 +71,8 @@ class Administrador
     def insertarCasilla
         #Crea la tabla casilla si no la tenemos ya en el sistema
         @con.query("CREATE TABLE IF NOT EXISTS casilla(idCasilla varchar(20) PRIMARY KEY \
-                    ,precioCompra int, precioVenta int, cuota int \
                     ,tipoCasilla varchar(20) \
+                    ,precioCompra int, precioVenta int, cuota int \
                         CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
                     ,efectoCasilla varchar(10000));")
         puts 'Inserte el idCasilla que desea agregar'
@@ -138,11 +138,18 @@ class Administrador
         puts 'Inserte el idCasilla que desea ver'
         id_casilla = gets.chomp
         result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
+        fields = result.fetch_fields
+        puts "%3s %s" % [fields[0].name, fields[1].name]
+        result.each do |row|
+            puts "3%s %s" % [row['idCasilla'], row['tipoCasilla'], row['precioCompra'], row['precioVenta'], row['cuota'], row['efectoCasilla']]
+        end
+        begin=
         result.each do |array|
             array.each do |value|
                 puts value
             end
         end
+        =end
     end
             
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
