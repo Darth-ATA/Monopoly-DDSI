@@ -82,11 +82,9 @@ class Administrador
 
         result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
 
-        indice = 1
         result.each do |array|
-            array.each do |value|
-                puts "\t#{indice}- "+value
-                indice += 1
+            array.each_index do |i|
+                puts "\t#{i+1}- "+array[i]
             end
         end
     end
