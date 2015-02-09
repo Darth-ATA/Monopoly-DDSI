@@ -19,6 +19,18 @@ class Administrador
         puts @rs.fetch_row
 
     end
+
+    def visualizarQuery(result)
+        fields = result.fetch_fields
+        row = result.fetch_row
+
+        puts "\n"
+
+        fields.each_index do |i|
+            puts "#{fields[i].name}\t#{row[i]}\n\n"
+        end
+    end
+
     #---------------------- Subsistema de Tableros ----------------------#
     def insertarTablero
         #Crea la tabla tablero si no la tenemos ya en el sistema
@@ -165,15 +177,7 @@ class Administrador
 
         result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
 
-        fields = result.fetch_fields
-        row = result.fetch_row
-
-        puts "\n"
-
-        fields.each_index do |i|
-            puts "#{fields[i].name}\t#{row[i]}\n"
-        end
-
+        visualizarQuery result
     end
 
     #---------------------- Subsistema de Tarjetas ----------------------#
@@ -219,7 +223,11 @@ class Administrador
         puts 'Inserte el idTarjeta que desea ver'
         id_tarjeta = gets.chomp
 
-        @con.query("SELECT * FROM tarjeta where idTarjeta = '#{id_tarjeta}'")
+        result = @con.query("SELECT * FROM tarjeta where idTarjeta = '#{id_tarjeta}'")
+
+        visualizarQuery result
+
+
     end
 
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
