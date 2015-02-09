@@ -11,7 +11,7 @@ class Administrador
     end
 end
 begin
-    con = Mysql.new 'localhost', 'monopoly', 'monopoly', 'Monopoly'
+    con = Mysql.new 'localhost', 'alejandro', '26036162', 'Monopoly'
     
     gestionando = "vamos"
     subsistema = "vamos"
