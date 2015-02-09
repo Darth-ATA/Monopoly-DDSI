@@ -8,13 +8,13 @@ class Administrador
         #Son dos variables que controlan el menú
         @gestionando = 0
         @subsistema = 0
-        
+
         #Conecta con la base de datos y nos da la versión que se está usando
         @con = Mysql.new('localhost', 'monopoly', 'monopoly', 'Monopoly')
-        
+
         puts @con.get_server_info
         @rs = @con.query 'SELECT VERSION()'
-        puts @rs.fetch_row 
+        puts @rs.fetch_row
 
     end
     #---------------------- Subsistema de Tableros ----------------------#
@@ -55,8 +55,8 @@ class Administrador
     def verTablero
         puts 'Inserte el idTablero que desea ver'
         id_tablero = gets.chomp
-        result = @con.query("SELECT numeroCasillas FROM tablero WHERE idTablero = '#{id_tablero}'")
-        puts "El tablero #{id_tablero} tiene #{result} casillas y son: "
+        result = @con.query("SELECT * FROM tablero WHERE idTablero = '#{id_tablero}'").fetch_row
+        puts "El tablero #{result[0]} tiene #{result[1]} casillas y son: "
         result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
         indice = 1
         result.each do |array|
@@ -88,7 +88,7 @@ class Administrador
             cuota = gets.chomp
             @con.query("INSERT INTO casilla(idCasilla, precioCompra, precioVenta, cuota, tipoCasilla) \
                             VALUES('#{id_casilla}','#{precio_compra}','#{precio_venta}','#{cuota}', '#{tipo_casilla}')")
-        else 
+        else
             if tipo_casilla == "efecto"
                 puts 'Inserte una descripción del efecto de la dasilla'
                 efecto_casilla = gets.chomp
@@ -98,7 +98,7 @@ class Administrador
                 efecto_casilla = 'Coja una tarjeta de caja del centro del tablero'
             end
             @con.query("INSERT INTO casilla(idCasilla, efectoCasilla, tipoCasilla \
-                            VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}')")            
+                            VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}')")
         end
     end
     #Borrado de una casilla de la base de datos
@@ -139,10 +139,10 @@ class Administrador
         id_casilla = gets.chomp
 
         result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
-        
+
         fields = result.fetch_fields
         print "\n" + fields[0].name + "\t" + fields[1].name + "\t" + fields[2].name + "\t" + fields[3].name + "\t" + fields[4].name + "\t" + fields[5].name
-        
+
         result.each_hash do |row|
             print "\n" + row['idCasilla'] + "\t" + row['tipoCasilla'] + "\t" + row['precioCompra'] + "\t" + row['precioVenta'] + "\t" + row['cuota'] + "\t" + row['efectoCasilla'] +"\n"
         end
@@ -152,7 +152,7 @@ class Administrador
            # end
         #end
     end
-            
+
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
         while @subsistema != 9 do
@@ -217,7 +217,7 @@ begin
     individuo = Integer(gets.chomp)
     if(individuo == 1)
         admin = Administrador.new("admin")
-        admin.gestion        
+        admin.gestion
     else
         print "Usuario: "
         usuario = gets.chomp
@@ -227,11 +227,11 @@ begin
         puts "Bienvenido a Monopoly #{usuario}"
     end
 
-    
+
 rescue Mysql::Error => e
     puts e.errno
     puts e.error
-    
+
 ensure
     con.close if con
 end
