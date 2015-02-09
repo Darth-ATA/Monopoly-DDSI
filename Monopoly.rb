@@ -16,6 +16,7 @@ class Administrador
         puts @rs.fetch_row 
 
     end
+    #---------------------- Subsistema de Tableros ----------------------#
     #Inserción de un tablero en la base de datos
     def insertarTablero
         #Crea la tabla tablero si no la tenemos ya en el sistema
@@ -57,6 +58,45 @@ class Administrador
         puts 'Sus casillas asociadas son:'
         @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
     end
+
+    #---------------------- Subsistema de Casillas ----------------------#
+    def insertarCasilla
+        #Crea la tabla tablero si no la tenemos ya en el sistema
+        @con.query("CREATE TABLE IF NOT EXISTS casilla(idCasilla varchar(20) PRIMARY KEY \
+                    ,precioCompra int, precioVenta int, cuota int \
+                    ,tipoCasilla varchar(20) \
+                        CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
+                    ,efectoCasilla varchar(100));")
+        puts 'Inserte el idCasilla que desea agregar'
+        id_casilla = gets.chomp
+        puts 'Inserte el tipoCasilla que es'
+        tipo_casilla = gets.chomp
+        if tipo_casilla == "calle"
+            puts 'Inserte el precioCompra de la calle'
+            precio_compra = gets.chomp
+            puts 'Inserte el precioVenta de la calle'
+            precio_venta = gets.chomp
+            puts 'Inserte la cuota de la calle'
+            cuota = gets.chomp
+            @con.query("INSERT INTO casilla(idCasilla, precioCompra, precioVenta, cuota, tipoCasilla) \
+                            VALUES('#{id_casilla}','#{precio_compra}','#{precio_venta}','#{cuota}', '#{tipo_casilla}')")
+        else 
+            if tipo_casilla == "efecto"
+                puts 'Inserte una descripción del efecto de la vasilla'
+                efecto_casilla = gets.chomp
+            else
+                efecto_casilla = "Coja una tarjeta de #{tipo_casilla} del centro del tablero"
+            end
+            @con.query("INSERT INTO casilla(idCasilla, efectoCasilla, tipoCasilla \
+                            VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}')")            
+        end
+    end
+    #Borrado de un tablero de la base de datos
+    def borrarCasilla
+        puts 'Inserte el idCasilla que desea borrar'
+        id_casilla = gets.chomp
+        @con.query("DELETE FROM casilla WHERE ('#{id_casilla}' = idCasilla)")
+    end
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
         while @subsistema != 9 do
@@ -85,11 +125,20 @@ class Administrador
                 end
                 @gestionando = 0
             elsif @subsistema == 2
-                while @gestionando != "quit" do
+                while @gestionando != 9 do
                     puts "Gestión de Casillas"
-                    puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar"
+                    puts "\t1- Insertar \n\t2- Borrar \n\t3- Modificar \n\t4- Ver \n\t9- Salir"
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
+                    if @gestionando == 1
+                        self.insertarCasilla
+                    elsif @gestionando == 2
+                        self.borrarCasilla
+                    elsif @gestionando == 3
+                        self.modificarCasilla
+                    elsif @gestinando == 4
+                        self.verCasilla
+                    end
                 end
                 @gestionando = 0
             elsif @subsistema == 3
