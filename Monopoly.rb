@@ -74,7 +74,7 @@ class Administrador
                     ,precioCompra int, precioVenta int, cuota int \
                     ,tipoCasilla varchar(20) \
                         CHECK(tipoCasilla='calle' or tipoCasilla='estacion' or tipoCasilla='efecto' or tipoCasilla='suerte' or tipoCasilla='caja') \
-                    ,efectoCasilla varchar(100));")
+                    ,efectoCasilla varchar(10000));")
         puts 'Inserte el idCasilla que desea agregar'
         id_casilla = gets.chomp
         puts 'Inserte el tipoCasilla que es'
@@ -90,21 +90,50 @@ class Administrador
                             VALUES('#{id_casilla}','#{precio_compra}','#{precio_venta}','#{cuota}', '#{tipo_casilla}')")
         else 
             if tipo_casilla == "efecto"
-                puts 'Inserte una descripción del efecto de la vasilla'
+                puts 'Inserte una descripción del efecto de la dasilla'
                 efecto_casilla = gets.chomp
+            elsif tipo_casilla == "suerte"
+                efecto_casilla = 'Coja una tarjeta de suerte del centro del tablero'
             else
-                efecto_casilla = "Coja una tarjeta de #{tipo_casilla} del centro del tablero"
+                efecto_casilla = 'Coja una tarjeta de caja del centro del tablero'
             end
             @con.query("INSERT INTO casilla(idCasilla, efectoCasilla, tipoCasilla \
                             VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}')")            
         end
     end
-    #Borrado de un tablero de la base de datos
+    #Borrado de una casilla de la base de datos
     def borrarCasilla
         puts 'Inserte el idCasilla que desea borrar'
         id_casilla = gets.chomp
         @con.query("DELETE FROM casilla WHERE ('#{id_casilla}' = idCasilla)")
     end
+    #Modificación de casilla de la base de datos
+    def modificarCasilla
+        puts 'Inserte el idCasilla que deasea modificar'
+        id_casilla = gets.chomp
+        puts "¿Qué desea modificar? \n\t1- Todo \n\t2- PrecioCompra/PrecioVenta/Cuota \n\t3- Efecto \n\t9- Salir"
+        modificar = Integer(gets.chomp)
+        if modificar == 1
+            @con.query("DELETE FROM casilla WHERE ('#{id_casilla}' = idCasilla)")
+            self.insertarCasilla
+        elsif modificar == 2
+            print "PrecioCompra = "
+            precio_compra = Integer(gets.chomp)
+            print "PrecioVenta = "
+            precio_venta = Integer(gets.chomp)
+            print "Cuota = "
+            cuota = Integer(gets.chomp)
+            @con.query("UPDATE casilla SET precioCompra = '#{precio_compra}' \
+                                        && precioVenta = '#{precio_venta}' \
+                                        && cuota = '#{cuota}' \
+                                        WHERE ('#{id_casilla}' = idCasilla)")
+        elsif modificar == 3
+            print "Efecto : "
+            efecto_casilla = gets.chomp
+            @con.query("UPDATE casilla SET efecto_casilla = '#{efecto_casilla}' WHERE ('#{id_casilla}' = idCasilla)")
+        end
+    end
+            
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
         while @subsistema != 9 do
