@@ -2,6 +2,8 @@
 
 require 'mysql'
 
+NUM_PARTIDA = 0
+
 class Administrador
     def initialize(nombre = "admin")
         @nombre = nombre
@@ -286,6 +288,81 @@ class Administrador
         end
     end
 end
+
+class Sistema
+    def Initialize(nombre = 'luck-lord')
+        @nombre = nombre
+        @num_partida = NUM_PARTIDA
+        NUM_PARTIDA += NUM_PARTIDA
+        @fecha_actual = Time.now
+
+        #Conecta con la base de datos y nos da la versión que se está usando
+        @con = Mysql.new('localhost', 'monopoly', 'monopoly', 'Monopoly')
+
+        puts @con.get_server_info
+        @rs = @con.query 'SELECT VERSION()'
+        puts @rs.fetch_row
+    end
+    def añadirPartida
+        @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida VARCHAR(10) PRIMARY KEY \
+                        ,fecha date NOT NULL \
+                        ,estado VARCHAR(20) NOT NULL);")
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+                        ,nick VARCHAR(20) REFERENCES jugador(nick) \
+                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTablero(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+                        ,idTablero VARCHAR(20) REFERENCES tablero(idTablero) \
+                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTarjeta(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+                        ,idTarjeta VARCHAR(20) REFERENCES tarjeta(idTarjeta) \
+                        ,CONSTRAINT clave_primaria PRIMARY KEY (idTarjeta))")
+
+        @fecha_actual = Time.now
+
+        print 'Jugador 1: '
+        id_jugador1 = gets.chomp
+        print 'Jugador 2: '
+        id_jugador2 = gets.chomp
+        print 'Jugador 3: '
+        id_jugador3 = gets.chomp
+        print 'Jugador 4: '
+        id_jugador4 = gets.chomp
+
+        jugadores = [id_jugador1,id_jugador2,id_jugador3,id_jugador4]
+
+        @con.query("INSERT INTO partida(idPartida,fecha,estado) VALUES('#{@num_partida}' \
+                                                                      ,'#{@fecha_actual}' \
+                                                                      ,'partida_nueva')")
+        jugadores.each do |jugador|
+            @con.query("INSERT INTO PtieneJugador(idPartida,nick) VALUES('#{@num_partida}' \
+                                                                        ,'#{jugador}')")
+        end
+        puts '¿Qué tablero uso?'
+        id_tablero = gets.chomp
+        @con.query("INSERT INTO PtieneTablero(idPartida,idTablero) VALUES('#{@num_partida}' \
+                                                                         ,'#{id_tablero}')")
+        #Aquí habría que coger una colección aleatoria de tarjetas y añadirlas a la tabla PtieneTarjeta
+    end
+    def añadirPropiedadJugador
+        @con.query("CREATE TABLE IF NOT EXISTS posee(idPartida VAHRCAR(10) REFERENCES partida(idPartida) \
+                        ,nick VARCHAR(20) REFERENCES jugador(nick) \
+                        ,idPropiedad int REFERENCES propiedad(idPropiedad) \
+                        ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
+        puts '¿Qué propiedad se ha comprado?'
+        id_propiedad = gets.chomp
+        
+        puts '¿Qué jugador ha comprado una propiedad? '
+        id_jugador = gets.chomp
+
+        @con.query("INSERT INTO posee(idPartida,nick,idPropiedad) VALUES('#{@nombre}','#{id_jugador}','#{id_propiedad}')")
+    end
+    def borrarPropiedadJugador
+        puts '¿Qué propiedad se ha vendido?'
+        id_propiedad = gets.chomp
+
+        @con.query("DELETE FROM posee WHERE idPropiedad = '#{id_propiedad}'")
+    end
+
 
 begin
     con = Mysql.new 'localhost', 'monopoly', 'monopoly', 'Monopoly'
