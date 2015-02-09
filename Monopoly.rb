@@ -71,6 +71,7 @@ class Administrador
 
     end
 
+    #Función auxiliar para visualizar la primera fila de una consulta
     def visualizarQuery(result)
         fields = result.fetch_fields
         row = result.fetch_row
@@ -96,6 +97,7 @@ class Administrador
 
         @con.query("DELETE FROM tablero WHERE ('#{id_tablero}' = idTablero)")
     end
+
     #Asocia una casilla a un tablero
     def asociarCasilla
         puts 'Inserte el idTablero que al que desea asociar casilla'
@@ -106,6 +108,7 @@ class Administrador
 
         @con.query("INSERT INTO asociada(idTablero,idCasilla) VALUES('#{id_tablero}','#{id_casilla}')")
     end
+
     #Desasocia una casilla de un tablero
     def desAsociarCasilla
         puts 'Inserte el idTablero del que desea desasociar la casilla'
@@ -116,6 +119,7 @@ class Administrador
 
         @con.query("DELETE FROM asociada WHERE ('#{id_tablero}' = idTablero && '#{id_casilla}' = idCasilla)")
     end
+
     #Ve el número de casillas y las casillas del tablero
     def verTablero
         puts 'Inserte el idTablero que desea ver'
@@ -167,6 +171,7 @@ class Administrador
                             VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}'))")
         end
     end
+
     #Borrado de una casilla de la base de datos
     def borrarCasilla
         puts 'Inserte el idCasilla que desea borrar'
@@ -174,6 +179,7 @@ class Administrador
 
         @con.query("DELETE FROM casilla WHERE ('#{id_casilla}' = idCasilla)")
     end
+
     #Modificación de casilla de la base de datos
     def modificarCasilla
         puts 'Inserte el idCasilla que deasea modificar'
@@ -205,6 +211,7 @@ class Administrador
             @con.query("UPDATE casilla SET efecto_casilla = '#{efecto_casilla}' WHERE ('#{id_casilla}' = idCasilla)")
         end
     end
+
     #Vision de la información de una casilla
     def verCasilla
         puts 'Inserte el idCasilla que desea ver'
@@ -229,12 +236,14 @@ class Administrador
         @con.query("INSERT INTO tarjeta(idTarjeta, tipoTarjeta, efectoTarjeta) \
                             VALUES('#{id_tarjeta}','#{tipo_tarjeta}','#{efecto_tarjeta}')")
     end
+
     def borrarTarjeta
         puts 'Inserte el idTarjeta que desea borrar'
         id_tarjeta = gets.chomp
 
         @con.query("DELETE FROM tarjeta WHERE ('#{id_tarjeta}' = idTarjeta)")
     end
+
     def modificarTarjeta
         puts 'Inserte el idTarjeta que desea modificar'
         id_tarjeta = gets.chomp
@@ -249,6 +258,7 @@ class Administrador
                                         && efectoTarjeta = '#{efecto_tarjeta}' \
                                         WHERE ('#{id_tarjeta}' = idTarjeta)")
     end
+
     def verTarjeta
         puts 'Inserte el idTarjeta que desea ver'
         id_tarjeta = gets.chomp
@@ -387,6 +397,7 @@ class Sistema
 
         @con.query("DELETE FROM posee WHERE idPropiedad = '#{id_propiedad}'")
     end
+end
 
 
 begin
@@ -408,7 +419,6 @@ begin
         puts "................."
         puts "Bienvenido a Monopoly #{usuario}"
     end
-end
 
 
 rescue Mysql::Error => e
