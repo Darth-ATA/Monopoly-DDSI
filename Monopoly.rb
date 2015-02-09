@@ -133,6 +133,17 @@ class Administrador
             @con.query("UPDATE casilla SET efecto_casilla = '#{efecto_casilla}' WHERE ('#{id_casilla}' = idCasilla)")
         end
     end
+    #Vision de la información de una casilla
+    def verCasilla
+        puts 'Inserte el idCasilla que desea ver'
+        id_casilla = gets.chomp
+        result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
+        result.each do |array|
+            array.each do |value|
+                puts value
+            end
+        end
+    end
             
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
@@ -173,7 +184,7 @@ class Administrador
                         self.borrarCasilla
                     elsif @gestionando == 3
                         self.modificarCasilla
-                    elsif @gestinando == 4
+                    elsif @gestionando == 4
                         self.verCasilla
                     end
                 end
