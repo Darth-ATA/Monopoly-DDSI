@@ -114,7 +114,7 @@ class Administrador
                 efecto_casilla = 'Coja una tarjeta de caja del centro del tablero'
             end
             @con.query("INSERT INTO casilla(idCasilla, efectoCasilla, tipoCasilla \
-                            VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}')")
+                            VALUES ('#{id_casilla}','#{efecto_casilla}','#{tipo_casilla}'))")
         end
     end
     #Borrado de una casilla de la base de datos
@@ -195,7 +195,7 @@ class Administrador
         
         @con.query("DELETE FROM tarjeta WHERE ('#{id_tarjeta}' = idTarjeta)")
     end
-    def ModificarTarjeta
+    def modificarTarjeta
         puts 'Inserte el idTarjeta que desea modificar'
         id_tarjeta = gets.chomp
         
@@ -209,6 +209,11 @@ class Administrador
                                         && efectoTarjeta = '#{efecto_tarjeta}' \
                                         WHERE ('#{id_tarjeta}' = idTarjeta)")
     end
+    def verTarjeta
+        puts 'Inserte el idTarjeta que desea ver'
+        id_tarjeta = gets.chomp
+
+        @con.query("SELECT * FROM tarjeta where idTarjeta = '#{id_tarjeta}'")
 
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
