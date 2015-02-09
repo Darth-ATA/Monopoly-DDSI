@@ -2,7 +2,7 @@
 
 require 'mysql'
 
-NUM_PARTIDA = 0
+$NUM_PARTIDA = 0
 
 class Administrador
     def initialize(nombre = "admin")
@@ -166,11 +166,18 @@ class Administrador
         result = @con.query("select * from casilla where (idCasilla = '#{id_casilla}') ")
 
         fields = result.fetch_fields
+        row = result.fetch_row
+
+        puts "\n"
+
+        fields.zip(row).each do |field, row|
+            puts field.name ": " row
+        end
+
+
         print "\n" + fields[0].name + "\t" + fields[1].name + "\t" + fields[2].name + "\t" + fields[3].name + "\t" + fields[4].name + "\t" + fields[5].name
 
-        result.each_hash do |row|
-            print "\n" + row['idCasilla'] + "\t" + row['tipoCasilla'] + "\t" + row['precioCompra'] + "\t" + row['precioVenta'] + "\t" + row['cuota'] + "\t" + row['efectoCasilla'] +"\n"
-        end
+        puts "\n #{row[0]}\t#{row[1]}\t#{row[2]}\t#{row[3]}\t#{row[4]}\t#{row[5]}\n"
     end
 
     #---------------------- Subsistema de Tarjetas ----------------------#
@@ -292,8 +299,8 @@ end
 class Sistema
     def Initialize(nombre = 'luck-lord')
         @nombre = nombre
-        @num_partida = NUM_PARTIDA
-        NUM_PARTIDA += NUM_PARTIDA
+        @num_partida = $NUM_PARTIDA
+        $NUM_PARTIDA += $NUM_PARTIDA
         @fecha_actual = Time.now
 
         #Conecta con la base de datos y nos da la versión que se está usando
@@ -350,7 +357,7 @@ class Sistema
                         ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
         puts '¿Qué propiedad se ha comprado?'
         id_propiedad = gets.chomp
-        
+
         puts '¿Qué jugador ha comprado una propiedad? '
         id_jugador = gets.chomp
 
