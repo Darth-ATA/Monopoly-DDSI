@@ -215,6 +215,7 @@ class Administrador
         id_tarjeta = gets.chomp
 
         @con.query("SELECT * FROM tarjeta where idTarjeta = '#{id_tarjeta}'")
+    end
 
     #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
