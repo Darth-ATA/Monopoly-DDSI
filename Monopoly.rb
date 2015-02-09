@@ -19,37 +19,45 @@ class Administrador
     #Inserción de un tablero en la base de datos
     def insertarTablero
         #Crea la tabla tablero si no la tenemos ya en el sistema
-        @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) primary key, numeroCasillas int);")
+        @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) PRIMARY KEY, numeroCasillas int);")
         puts 'Inserte el idTablero que desea agregar'
         id_tablero = gets.chomp
         @con.query("INSERT INTO tablero(idTablero) VALUES('#{id_tablero}');")
     end
+    #Borrado de un tablero de la base de datos
     def borrarTablero
         puts 'Inserte el idTablero que desea borrar'
         id_tablero = gets.chomp
-        @con.query("DELETE FROM tablero where ('#{id_tablero}' = idTablero)")
+        @con.query("DELETE FROM tablero WHERE ('#{id_tablero}' = idTablero)")
     end
+    #Asocia una casilla a un tablero
     def asociarCasilla
-        @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) references tablero(idTablero),idCasilla varchar(20) references casilla(idCasilla) \
-                    ,primary key(idTablero,idCasilla));")
+        @con.query("CREATE TABLE IF NOT EXISTS asociada(idTablero varchar(20) REFERENCES tablero(idTablero) \
+                    ,idCasilla varchar(20) REFERENCES casilla(idCasilla) \
+                    ,PRIMARY KEY(idTablero,idCasilla));")
         puts 'Inserte el idTablero que al que desea asociar casilla'
         id_tablero = gets.chomp
         puts 'Inserte el idCasilla que desea asociar'
         id_casilla = gets.chomp
         @con.query("INSERT INTO asociada(idTablero,idCasilla) VALUES('#{id_tablero}','#{id_casilla}')")
     end
+    #Desasocia una casilla de un tablero
     def desAsociarCasilla
         puts 'Inserte el idTablero del que desea desasociar la casilla'
         id_tablero = gets.chomp
         puts 'Inserte la idCasilla de la casilla que desea desasociar'
         id_casilla = gets.chomp
-        @con.query("DELETE FROM asociada where ('#{id_tablero}' = idTablero && '#{id_casilla}' = idCasilla)")
+        @con.query("DELETE FROM asociada WHERE ('#{id_tablero}' = idTablero && '#{id_casilla}' = idCasilla)")
     end
+    #Ve el número de casillas y las casillas del tablero
     def verTablero
         puts 'Inserte el idTablero que desea ver'
         id_tablero = gets.chomp
-        @con.query("Select * from tablero where idTablero = '#{id_tablero}'")
+        @con.query("SELECT * FROM tablero WHERE idTablero = '#{id_tablero}'")
+        puts 'Sus casillas asociadas son:'
+        @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
     end
+    #Método que se ocupa del manejo de todas las funcionalidades del administrador
     def gestion
         while @subsistema != 9 do
             puts "Bienvenido Administrador"
@@ -75,7 +83,7 @@ class Administrador
                     end
 
                 end
-                @gestionando = "OK"
+                @gestionando = 0
             elsif @subsistema == 2
                 while @gestionando != "quit" do
                     puts "Gestión de Casillas"
@@ -83,7 +91,7 @@ class Administrador
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
                 end
-                @gestionando = "OK"
+                @gestionando = 0
             elsif @subsistema == 3
                 while @gestionando != "quit" do
                     puts "Gestión de Tarjetas"
@@ -91,7 +99,7 @@ class Administrador
                     print "Opcion: "
                     @gestionando = Integer(gets.chomp)
                 end
-                @gestionando = "OK"
+                @gestionando = 0
             end
         end
     end
