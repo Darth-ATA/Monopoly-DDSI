@@ -170,14 +170,10 @@ class Administrador
 
         puts "\n"
 
-        fields.zip(row).each do |field, row|
-            puts field.name ": " row
+        fields.each_index do |i|
+            puts "#{fields[i].name}\t#{row[i]}\n"
         end
 
-
-        print "\n" + fields[0].name + "\t" + fields[1].name + "\t" + fields[2].name + "\t" + fields[3].name + "\t" + fields[4].name + "\t" + fields[5].name
-
-        puts "\n #{row[0]}\t#{row[1]}\t#{row[2]}\t#{row[3]}\t#{row[4]}\t#{row[5]}\n"
     end
 
     #---------------------- Subsistema de Tarjetas ----------------------#
@@ -390,6 +386,7 @@ begin
         puts "................."
         puts "Bienvenido a Monopoly #{usuario}"
     end
+end
 
 
 rescue Mysql::Error => e
