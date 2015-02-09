@@ -24,7 +24,7 @@ class Administrador
         @con.query("CREATE TABLE IF NOT EXISTS tablero(idTablero varchar(20) PRIMARY KEY, numeroCasillas int);")
         puts 'Inserte el idTablero que desea agregar'
         id_tablero = gets.chomp
-        @con.query("INSERT INTO tablero(idTablero) VALUES('#{id_tablero}');")
+        @con.query("INSERT INTO tablero(idTablero, numeroCasillas) VALUES('#{id_tablero}', '0');")
     end
     #Borrado de un tablero de la base de datos
     def borrarTablero
