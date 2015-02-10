@@ -18,9 +18,8 @@ sistema MariaDB (Implementación de MySQL) y RUBY(Lenguaje de Programación)
 
 Además de tener una tabla y un usuario añadidos a MariaDB
 
-Aquí se detallan los pasos a seguir para que todo quede listo para la ejecución, yo sé los pasos exactos para arch, pero cuando vea pacman o pacaur sustituyalo por el comando de instalación de su gestor de paquetes
-
-Cualquier problema, mirar la wiki de Arch ya que suele explicarlo todo muy bien
+Aquí se detallan los pasos a seguir para que todo quede listo para la ejecución en un sistema Arch.
+El archivo configure.sh es un script con los pasos aquí descritos.
 
 1.	pacman -S mariadb
 2.  systemctl start mysqld.service
