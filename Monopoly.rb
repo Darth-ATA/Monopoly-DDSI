@@ -136,6 +136,8 @@ class Administrador
 
     #Ve el número de casillas y las casillas del tablero
     def verTablero
+        puts 'Los tableros disponibles son los siguientes'
+        visualizarPosibilidades("tablero", "idTablero")
         puts 'Inserte el idTablero que desea ver'
         id_tablero = gets.chomp
 
@@ -144,11 +146,13 @@ class Administrador
 
         result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
 
+        puts "-----"
         result.each do |array|
             array.each_index do |i|
                 puts "\t#{i+1}- "+array[i]
             end
         end
+        puts "-----"
     end
 
     #---------------------- Subsistema de Casillas ----------------------#
@@ -277,6 +281,8 @@ class Administrador
     end
 
     def verTarjeta
+        puts 'Las tarjetas disponibles son los siguientes'
+        visualizarPosibilidades("tarjeta", "idTarjeta")
         puts 'Inserte el idTarjeta que desea ver'
         id_tarjeta = gets.chomp
 
