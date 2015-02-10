@@ -29,10 +29,9 @@ Cualquier problema, mirar la wiki de Arch ya que suele explicarlo todo muy bien
 5.	mysql_upgrade -u root -p
 6. 	mysql -u root -p
 7.	CREATE USER monopoly@localhost IDENTIFIED BY 'some_pass';
-8. CREATE DATABASE Monopoly
+8. 	CREATE DATABASE Monopoly
 9. 	GRANT ALL PRIVILEGES ON Monopoly.* TO monopoly@localhost WITH GRANT OPTION
 10.	quit
-
 11. sudo pacman -S ruby
 12.	añadir en el bashrc PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
 13.	gem install mysql
