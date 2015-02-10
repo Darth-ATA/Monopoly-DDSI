@@ -11,6 +11,8 @@ class Administrador
         @gestionando = 0
         @subsistema = 0
 
+        @sistema = Sistema.new()
+
         #Conecta con la base de datos y nos da la versión que se está usando
         @con = Mysql.new('localhost', 'monopoly', 'monopoly', 'Monopoly')
 
@@ -44,27 +46,27 @@ class Administrador
         , CONSTRAINT tipo_tarjeta_valido CHECK(tipoTarjeta='suerte' or tipoTarjeta='caja'));")
 
         #Partida
-        @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida VARCHAR(10) PRIMARY KEY \
+        @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida INT PRIMARY KEY \
         ,fecha date NOT NULL \
         ,estado VARCHAR(20) NOT NULL);")
 
         #PtieneJugador
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida INT REFERENCES partida(idPartida) \
         ,nick VARCHAR(20) REFERENCES jugador(nick) \
-        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
+        ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida,nick))")
 
         #PtieneTablero
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneTablero(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTablero(idPartida INT REFERENCES partida(idPartida) \
         ,idTablero VARCHAR(20) REFERENCES tablero(idTablero) \
         ,CONSTRAINT clave_primaria PRIMARY KEY (idPartida))")
 
         #PtieneTarjeta
-        @con.query("CREATE TABLE IF NOT EXISTS PtieneTarjeta(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        @con.query("CREATE TABLE IF NOT EXISTS PtieneTarjeta(idPartida INT REFERENCES partida(idPartida) \
         ,idTarjeta VARCHAR(20) REFERENCES tarjeta(idTarjeta) \
         ,CONSTRAINT clave_primaria PRIMARY KEY (idTarjeta))")
 
         #Posee
-        @con.query("CREATE TABLE IF NOT EXISTS posee(idPartida VARCHAR(10) REFERENCES partida(idPartida) \
+        @con.query("CREATE TABLE IF NOT EXISTS posee(idPartida INT REFERENCES partida(idPartida) \
         ,nick VARCHAR(20) REFERENCES jugador(nick) \
         ,idPropiedad int REFERENCES propiedad(idPropiedad) \
         ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
@@ -274,7 +276,7 @@ class Administrador
     def gestion
         while @subsistema != 9 do
             puts "Bienvenido Administrador"
-            puts "¿Qué desea gestionar? \n\t1- Tablero \n\t2- Casillas \n\t3- Tarjetas \n\t9- Salir"
+            puts "¿Qué desea gestionar? \n\t1- Tablero \n\t2- Casillas \n\t3- Tarjetas \n\t4- Partidas \n\t9- Salir"
             print "Opcion: "
             @subsistema = Integer(gets.chomp)
 
@@ -335,17 +337,30 @@ class Administrador
                     end
                 end
                 @gestionando = 0
+            elsif @subsistema == 4
+                while @gestionando != 9 do
+                    puts "Gestión de Partidas"
+                    puts "\t1- Añadir partida \n\t2- Añadir propiedad jugador \n\t3- Borrar propiedad jugador \n\t9- Salir"
+                    print "Opcion: "
+                    @gestionando = Integer(gets.chomp)
+
+                    if @gestionando == 1
+                        @sistema.añadirPartida
+                    elsif @gestionando == 2
+                        @sistema.añadirPropiedadJugador
+                    elsif @gestionando == 3
+                        @sistema.borrarPropiedadJugador
+                    end
+                end
+                @gestionando = 0
             end
         end
     end
 end
 
 class Sistema
-    def Initialize(nombre = 'luck-lord')
+    def initialize(nombre = 'luck-lord')
         @nombre = nombre
-        @num_partida = $NUM_PARTIDA
-        $NUM_PARTIDA += $NUM_PARTIDA
-        @fecha_actual = Time.now
 
         #Conecta con la base de datos y nos da la versión que se está usando
         @con = Mysql.new('localhost', 'monopoly', 'monopoly', 'Monopoly')
@@ -354,9 +369,9 @@ class Sistema
         @rs = @con.query 'SELECT VERSION()'
         puts @rs.fetch_row
     end
-    def añadirPartida
 
-        @fecha_actual = Time.now
+    def añadirPartida
+        fecha_actual = Time.now
 
         print 'Jugador 1: '
         id_jugador1 = gets.chomp
@@ -369,19 +384,30 @@ class Sistema
 
         jugadores = [id_jugador1,id_jugador2,id_jugador3,id_jugador4]
 
-        @con.query("INSERT INTO partida(idPartida,fecha,estado) VALUES('#{@num_partida}' \
-                                                                      ,'#{@fecha_actual}' \
+        num_partida = @con.query("SELECT MAX(idPartida) FROM partida").fetch_row[0].to_i
+
+        if(num_partida == nil)
+            num_partida = 0;
+        else
+            num_partida += 1
+        end
+
+        @con.query("INSERT INTO partida(idPartida,fecha,estado) VALUES('#{num_partida}' \
+                                                                      ,'#{fecha_actual}' \
                                                                       ,'partida_nueva')")
+
+        puts "¿HOLA?"
         jugadores.each do |jugador|
-            @con.query("INSERT INTO PtieneJugador(idPartida,nick) VALUES('#{@num_partida}' \
+            @con.query("INSERT INTO PtieneJugador(idPartida,nick) VALUES('#{num_partida}' \
                                                                         ,'#{jugador}')")
         end
         puts '¿Qué tablero uso?'
         id_tablero = gets.chomp
-        @con.query("INSERT INTO PtieneTablero(idPartida,idTablero) VALUES('#{@num_partida}' \
+        @con.query("INSERT INTO PtieneTablero(idPartida,idTablero) VALUES('#{num_partida}' \
                                                                          ,'#{id_tablero}')")
         #Aquí habría que coger una colección aleatoria de tarjetas y añadirlas a la tabla PtieneTarjeta
     end
+
     def añadirPropiedadJugador
         puts '¿Qué propiedad se ha comprado?'
         id_propiedad = gets.chomp
@@ -391,6 +417,7 @@ class Sistema
 
         @con.query("INSERT INTO posee(idPartida,nick,idPropiedad) VALUES('#{@nombre}','#{id_jugador}','#{id_propiedad}')")
     end
+
     def borrarPropiedadJugador
         puts '¿Qué propiedad se ha vendido?'
         id_propiedad = gets.chomp
