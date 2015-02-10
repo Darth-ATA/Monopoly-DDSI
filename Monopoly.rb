@@ -45,10 +45,23 @@ class Administrador
         ,efectoTarjeta varchar(1000) \
         , CONSTRAINT tipo_tarjeta_valido CHECK(tipoTarjeta='suerte' or tipoTarjeta='caja'));")
 
+        #Jugador
+        @con.query("CREATE TABLE IF NOT EXISTS jugador(nick VARCHAR(20), \
+                                         password VARCHAR(20), \
+                                         email VARCHAR(20), \
+                                         partidasGanadas INTEGER, \
+                                         partidasPerdidas INTEGER, \
+                                         puntuacion INTEGER, \
+                                         dinero INTEGER, \
+                                         amigos VARCHAR(500), \
+                                         ficha VARCHAR(100) REFERENCES tieneFicha(nombre), \
+                                         CONSTRAINT clave_primaria PRIMARY KEY (nick)); ")
         #Partida
         @con.query("CREATE TABLE IF NOT EXISTS partida(idPartida INT PRIMARY KEY \
         ,fecha date NOT NULL \
-        ,estado VARCHAR(20) NOT NULL);")
+        ,estado VARCHAR(20) NOT NULL
+        ,estadoFinalizacion VARCHAR(20)
+        ,idGanador VARCHAR(20) REFERENCES jugador(nick));")
 
         #PtieneJugador
         @con.query("CREATE TABLE IF NOT EXISTS PtieneJugador(idPartida INT REFERENCES partida(idPartida) \
@@ -71,6 +84,63 @@ class Administrador
         ,idPropiedad int REFERENCES propiedad(idPropiedad) \
         ,CONSTRAINT clave_primaria PRIMARY KEY (idPropiedad));")
 
+        #####
+        #Creación de disparadores en caso de que no existan ya en la base de datos
+        #####
+
+        #Los borramos si los hubiera para que no haya conflictos
+        @con.query("DROP TRIGGER IF EXISTS asociarCasilla")
+        @con.query("DROP TRIGGER IF EXISTS borrarTablero")
+        @con.query("DROP TRIGGER IF EXISTS desasociarCasilla")
+        @con.query("DROP TRIGGER IF EXISTS terminarPartida")
+
+        #En caso de inser
+        @con.query("CREATE TRIGGER asociarCasilla AFTER INSERT ON asociada FOR EACH ROW \
+                        BEGIN \
+                            UPDATE numeroCasillas SET numeroCasillas = numeroCasillas + 1 \
+                            WHERE idTablero = NEW.idTablero; \
+                        END;")
+
+        @con.query("CREATE TRIGGER borrarTablero AFTER DELETE ON tablero FOR EACH ROW \
+                        BEGIN \
+                            DELETE FROM asociada \
+                            WHERE idTablero = OLD.idTablero; \
+                        END;")
+
+        @con.query("CREATE TRIGGER desasociarCasilla AFTER DELETE ON asociada FOR EACH ROW \
+                        BEGIN \
+                            UPDATE numeroCasillas SET numeroCasillas = numerocasillas - 1 \
+                            WHERE idTablero = OLD.idTablero; \
+                        END;")
+    
+        @con.query("CREATE TRIGGER terminarPartida AFTER UPDATE ON partida FOR EACH ROW \
+                    BEGIN \
+                        DECLARE ganadorEnPartida integer; \
+                        SELECT  count(*) \
+                        INTO    ganadorEnPartida \
+                        FROM    tieneJugador tJ \
+                        WHERE \
+                            tJ.nick = NEW.idGanador \
+                            AND \
+                            tJ.idPartida = NEW.idPartida; \
+                        IF NEW.estado = 'TERMINADA' THEN \
+                            UPDATE jugador J SET \
+                                J.puntuacion = J.puntuacion + 10, \
+                                J.partidasGanadas = J.partidasGanadas + 1 \
+                            WHERE J.nick = NEW.idGanador; \
+                        UPDATE Jugador J SET \
+                            J.puntuacion = J.puntuacion - 5, \
+                            J.partidasPerdidas = J.partidasPerdidas + 1 \
+                        WHERE J.nick IN(SELECT tJ.nick FROM tieneJugador tJ WHERE tJ.idPartida = NEW.idPartida AND \
+                                                                                  tJ.nick != NEW.idGanador); \
+                        END IF; \
+                    END;")
+
+        @con.query("CREATE TRIGGER nuevoJugador AFTER INSERT ON jugador FOR EACH ROW \
+                        BEGIN \
+                            INSERT INTO tieneFicha (nick, nombre) values (NEW.nick, FICHABASICA); \
+                            INSERT INTO tieneTablero (nick, nombre) values (NEW.nick, TABLEROBASICO); \
+                        END;")
     end
 
     #Función auxiliar para visualizar la primera fila de una consulta
@@ -397,7 +467,6 @@ class Sistema
     end
 
     def añadirPartida
-        fecha_actual = Time.now
 
         print 'Jugador 1: '
         id_jugador1 = gets.chomp
@@ -418,11 +487,12 @@ class Sistema
             num_partida += 1
         end
 
+        fecha_actual = Time.now
+        
         @con.query("INSERT INTO partida(idPartida,fecha,estado) VALUES('#{num_partida}' \
                                                                       ,'#{fecha_actual}' \
                                                                       ,'partida_nueva')")
 
-        puts "¿HOLA?"
         jugadores.each do |jugador|
             @con.query("INSERT INTO PtieneJugador(idPartida,nick) VALUES('#{num_partida}' \
                                                                         ,'#{jugador}')")
