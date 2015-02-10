@@ -142,17 +142,22 @@ class Administrador
         id_tablero = gets.chomp
 
         result = @con.query("SELECT * FROM tablero WHERE idTablero = '#{id_tablero}'").fetch_row
-        puts "El tablero #{result[0]} tiene #{result[1]} casillas y son: "
 
-        result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
+        if result.nil?
+            puts "No existe ese tablero"
+        else
+            puts "El tablero #{result[0]} tiene #{result[1]} casillas y son: "
 
-        puts "-----"
-        result.each do |array|
-            array.each_index do |i|
-                puts "\t#{i+1}- "+array[i]
+            result = @con.query("SELECT idCasilla FROM asociada WHERE idTablero = '#{id_tablero}'")
+
+            puts "-----"
+            result.each do |array|
+                array.each_index do |i|
+                    puts "\t#{i+1}- "+array[i]
+                end
             end
+            puts "-----"
         end
-        puts "-----"
     end
 
     #---------------------- Subsistema de Casillas ----------------------#
