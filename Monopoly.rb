@@ -85,6 +85,18 @@ class Administrador
         end
     end
 
+    def visualizarPosibilidades(table, id)
+        result = @con.query("SELECT #{id} FROM #{table}")
+        puts "-----"
+        result.each do |array|
+            array.each_index do |i|
+                puts "\t#{i+1}- "+array[i]
+            end
+        end
+        puts "-----"
+    end
+
+
     #---------------------- Subsistema de Tableros ----------------------#
     def insertarTablero
         puts 'Inserte el idTablero que desea agregar'
@@ -216,6 +228,9 @@ class Administrador
 
     #Vision de la información de una casilla
     def verCasilla
+        puts 'Las casillas disponibles son las siguientes'
+        visualizarPosibilidades("casilla", "idCasilla")
+
         puts 'Inserte el idCasilla que desea ver'
         id_casilla = gets.chomp
 
