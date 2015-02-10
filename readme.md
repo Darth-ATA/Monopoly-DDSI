@@ -37,7 +37,6 @@ Cualquier problema, mirar la wiki de Arch ya que suele explicarlo todo muy bien
 13.	gem install mysql
 14.	gem update
 15. gem install ruby
-16. mysql -u root -p
 
 
 
